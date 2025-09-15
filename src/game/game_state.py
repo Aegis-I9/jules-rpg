@@ -5,6 +5,7 @@ from src.items.item import Item, Equipment, ItemSlot
 from src.items.item_generator import create_random_item
 from src.society.faction_manager import FactionManager
 from src.professions.profession import Alchemy, Herbalism
+from src.npcs.npc import Monster
 
 class GameState:
     """
@@ -20,6 +21,11 @@ class GameState:
         # Adiciona profissões iniciais ao jogador
         self.player.professions["alquimia"] = Alchemy()
         self.player.professions["herbalismo"] = Herbalism()
+
+        self.monsters_in_scene = []
+        # Adiciona um monstro de teste
+        goblin = Monster(name="Goblin Saqueador", description="Um goblin pequeno e hostil com um olhar cruel.", level=1, hp=8, armor=2)
+        self.monsters_in_scene.append(goblin)
 
         # Adiciona itens de teste
         self.player.inventory.add_item(Equipment("Adaga de Aço", "Uma adaga simples.", ItemSlot.WEAPON))
@@ -98,9 +104,43 @@ class GameState:
                     new_item = create_random_item(item_level)
                     self.player.inventory.add_item(new_item)
                     print(f"Item aleatório gerado e adicionado: {new_item.name}")
+                # Lógica para combate
+                elif key == "player.attack":
+                    target_name = value
+                    target = next((m for m in self.monsters_in_scene if m.name.lower() == target_name.lower()), None)
+                    if target:
+                        attack_narration = self.resolve_attack(self.player, target)
+                        # Este é um ponto para melhorar: como mesclar esta narração com a da IA?
+                        # Por enquanto, apenas imprimimos no console do servidor.
+                        print(attack_narration)
+                    else:
+                        print(f"Alvo de ataque não encontrado: {target_name}")
 
             except Exception as e:
                 print(f"Erro ao aplicar a mudança de estado '{key}': {e}")
+
+    def resolve_attack(self, attacker: Character, target: Character) -> str:
+        """
+        Resolve uma tentativa de ataque de um personagem contra outro.
+        Retorna uma string de narração com o resultado.
+        """
+        narration = ""
+        # Simplificando: DC para acertar é 10 + armadura do alvo
+        dc_to_hit = 10 + target.armor
+        hit_success, roll = attacker.perform_check("dexterity", dc_to_hit)
+
+        if hit_success:
+            # Dano = 1d4 + modificador de força
+            damage = roll("1d4") + attacker.get_attribute_modifier("strength")
+            narration = f"{attacker.name} ataca {target.name} e acerta! (Rolagem {roll}). Causa {damage} de dano."
+            target.take_damage(damage)
+            if not target.is_alive():
+                narration += f" {target.name} foi derrotado!"
+                self.monsters_in_scene.remove(target)
+        else:
+            narration = f"{attacker.name} ataca {target.name}, mas erra! (Rolagem {roll})."
+
+        return narration
 
     def identify_item(self, item_name: str) -> str:
         """
@@ -158,11 +198,15 @@ class GameState:
             "character": {
                 "name": self.player.name,
                 "level": self.player.level,
+                "hp": f"{self.player.hp}/{self.player.max_hp}",
+                "mp": f"{self.player.mp}/{self.player.max_mp}",
+                "armor": self.player.armor,
                 "attributes": self.player.attributes,
-                "hp": self.player.health_points,
                 "professions": {name: prof.level for name, prof in self.player.professions.items()}
             },
             "inventory": inventory_list,
             "map": map_string,
-            "reputation": self.faction_manager.get_all_reputations()
+            "reputation": self.faction_manager.get_all_reputations(),
+            "monsters": [{"name": m.name, "hp": f"{m.hp}/{m.max_hp}"} for m in self.monsters_in_scene],
+            "location": self.game_map.points_of_interest.get(self.player.position)
         }

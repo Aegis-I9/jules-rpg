@@ -34,50 +34,77 @@ class Inventory:
         self.backpack.append(item)
         print(f"'{item.name}' foi adicionado à sua mochila.")
 
-    def equip(self, item_to_equip: Equipment):
+    def equip(self, character, item_to_equip: Equipment):
         """
-        Equipa um item da mochila.
+        Equipa um item da mochila, aplicando seus bônus ao personagem.
         """
         if not isinstance(item_to_equip, Equipment):
             print(f"'{item_to_equip.name}' não é um item equipável.")
             return
-
         if item_to_equip not in self.backpack:
             print(f"'{item_to_equip.name}' não está na sua mochila.")
             return
 
-        slot = item_to_equip.slot
+        # Unequip item if slot is occupied
+        slot_to_fill = self._get_slot_to_fill(item_to_equip.slot)
+        if not slot_to_fill:
+            print(f"Todos os slots para '{item_to_equip.slot.value}' estão ocupados.")
+            return
 
-        # Lógica para slots duplicados (anéis e brincos)
+        if self.equipped[slot_to_fill]:
+            self.unequip(character, slot_to_fill)
+
+        # Equip new item
+        self.equipped[slot_to_fill] = item_to_equip
+        self.backpack.remove(item_to_equip)
+        self._apply_item_bonus(character, item_to_equip)
+        print(f"'{item_to_equip.name}' equipado.")
+
+    def unequip(self, character, slot_to_unequip):
+        """
+        Desequipa um item, removendo seus bônus e movendo-o para a mochila.
+        """
+        item = self.equipped.get(slot_to_unequip)
+        if not item:
+            print(f"Nenhum item equipado no slot '{slot_to_unequip}'.")
+            return
+
+        self._remove_item_bonus(character, item)
+        self.add_item(item)
+        self.equipped[slot_to_unequip] = None
+        print(f"'{item.name}' desequipado.")
+
+    def _get_slot_to_fill(self, slot: ItemSlot):
+        """Helper para encontrar um slot vago, especialmente para anéis e brincos."""
         if slot == ItemSlot.RING:
-            if self.equipped["ring_1"] is None:
-                self.equipped["ring_1"] = item_to_equip
-                self.backpack.remove(item_to_equip)
-                print(f"'{item_to_equip.name}' equipado no anel 1.")
-            elif self.equipped["ring_2"] is None:
-                self.equipped["ring_2"] = item_to_equip
-                self.backpack.remove(item_to_equip)
-                print(f"'{item_to_equip.name}' equipado no anel 2.")
-            else:
-                print("Ambos os slots de anel estão ocupados.")
+            if self.equipped["ring_1"] is None: return "ring_1"
+            if self.equipped["ring_2"] is None: return "ring_2"
         elif slot == ItemSlot.EARRING:
-            if self.equipped["earring_1"] is None:
-                self.equipped["earring_1"] = item_to_equip
-                self.backpack.remove(item_to_equip)
-                print(f"'{item_to_equip.name}' equipado no brinco 1.")
-            elif self.equipped["earring_2"] is None:
-                self.equipped["earring_2"] = item_to_equip
-                self.backpack.remove(item_to_equip)
-                print(f"'{item_to_equip.name}' equipado no brinco 2.")
-            else:
-                print("Ambos os slots de brinco estão ocupados.")
-        # Lógica para slots únicos
-        elif self.equipped.get(slot) is None:
-            self.equipped[slot] = item_to_equip
-            self.backpack.remove(item_to_equip)
-            print(f"'{item_to_equip.name}' equipado.")
-        else:
-            print(f"O slot '{slot.value}' já está ocupado.")
+            if self.equipped["earring_1"] is None: return "earring_1"
+            if self.equipped["earring_2"] is None: return "earring_2"
+        elif slot in self.equipped:
+            return slot
+        return None
+
+    def _apply_item_bonus(self, character, item: Equipment):
+        """Aplica os bônus de um item ao personagem."""
+        if not item.stats_bonus: return
+        for stat, value in item.stats_bonus.items():
+            if hasattr(character, stat):
+                setattr(character, stat, getattr(character, stat) + value)
+            elif stat in character.attributes:
+                character.attributes[stat] += value
+            print(f"Aplicando bônus: +{value} {stat}")
+
+    def _remove_item_bonus(self, character, item: Equipment):
+        """Remove os bônus de um item do personagem."""
+        if not item.stats_bonus: return
+        for stat, value in item.stats_bonus.items():
+            if hasattr(character, stat):
+                setattr(character, stat, getattr(character, stat) - value)
+            elif stat in character.attributes:
+                character.attributes[stat] -= value
+            print(f"Removendo bônus: -{value} {stat}")
 
     def __str__(self) -> str:
         """
