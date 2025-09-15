@@ -8,6 +8,7 @@ class GameMap:
         self.width = width
         self.height = height
         self.grid = self._initialize_grid()
+        self.points_of_interest = {}
 
     def _initialize_grid(self) -> list:
         """
@@ -29,6 +30,15 @@ class GameMap:
                 elif random.random() < 0.1:
                     self.grid[y][x] = '#'
 
+        # Adiciona um Ponto de Interesse (POI) de exemplo
+        poi_x, poi_y = 5, 5
+        if self.is_walkable(poi_x, poi_y):
+            self.points_of_interest[(poi_x, poi_y)] = {
+                "name": "Altar Antigo",
+                "description": "Um altar de pedra coberto de musgo e runas que você não reconhece."
+            }
+
+
     def is_walkable(self, x: int, y: int) -> bool:
         """
         Verifica se um tile no mapa é caminhável.
@@ -47,6 +57,8 @@ class GameMap:
             for x in range(self.width):
                 if player_position and (x, y) == player_position:
                     row += '@'
+                elif (x, y) in self.points_of_interest:
+                    row += '*' # Caractere para POI
                 else:
                     row += self.grid[y][x]
             map_str += row + '\n'

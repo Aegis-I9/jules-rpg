@@ -7,7 +7,18 @@ class Character:
         self.profession = profession
         self.level = 1
 
-        self.health_points = {"current": 10, "max": 10}
+        # Estatísticas de Combate
+        self.hp = 10
+        self.max_hp = 10
+        self.mp = 5
+        self.max_mp = 5
+        self.armor = 0
+        self.resistances = {
+            "physical": 0.0, # Redução de 0%
+            "fire": 0.0,     # Redução de 0%
+            "ice": 0.0,      # Redução de 0%
+            "magic": 0.0     # Redução de 0%
+        }
 
         # Atributos base do personagem
         self.attributes = {
@@ -80,3 +91,41 @@ class Character:
         print(f"Teste de {attribute_to_check.capitalize()}: Rolagem(1d20) = {dice_roll}, Modificador = {modifier}, Total = {total_roll} vs DC {dc}. {'Sucesso' if success else 'Falha'}.")
 
         return success, total_roll
+
+    def get_total_attribute(self, attribute_name: str) -> int:
+        """
+        Calcula o valor total de um atributo, incluindo bônus de equipamento.
+        """
+        base_value = self.attributes.get(attribute_name, 0)
+        bonus = 0
+        if self.inventory:
+            for item in self.inventory.equipped.values():
+                if item and isinstance(item, item.Equipment) and item.stats_bonus:
+                    bonus += item.stats_bonus.get(attribute_name, 0)
+        return base_value + bonus
+
+    def take_damage(self, amount: int, damage_type: str = "physical"):
+        """
+        Aplica dano ao personagem, considerando armadura e resistências.
+        """
+        resistance_multiplier = 1.0 - self.resistances.get(damage_type, 0.0)
+        damage_after_resistance = amount * resistance_multiplier
+
+        final_damage = max(0, damage_after_resistance - self.armor)
+        self.hp -= final_damage
+        self.hp = max(0, self.hp) # Não deixa o HP ficar negativo
+        print(f"{self.name} sofreu {final_damage:.1f} de dano! HP restante: {self.hp}/{self.max_hp}")
+
+    def heal(self, amount: int):
+        """
+        Cura o personagem.
+        """
+        self.hp += amount
+        self.hp = min(self.max_hp, self.hp) # Não deixa o HP passar do máximo
+        print(f"{self.name} foi curado em {amount}! HP atual: {self.hp}/{self.max_hp}")
+
+    def is_alive(self) -> bool:
+        """
+        Verifica se o personagem está vivo.
+        """
+        return self.hp > 0

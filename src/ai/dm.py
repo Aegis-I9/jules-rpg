@@ -42,6 +42,8 @@ def get_ai_response(game_state_dict: dict, player_action: str) -> dict:
         *   **Reputação:** As reações dos NPCs devem ser influenciadas pela reputação do jogador com a facção deles. Ações contra uma facção devem diminuir a reputação. Ajuda deve aumentar. Use `"state_changes": {"reputation.Nome da Facção": -5}` para alterar a reputação.
         *   **Profissões:** Ofereça oportunidades para o jogador usar suas profissões. Se houver ervas, um jogador com Herbalismo pode tentar coletá-las. Se ele tiver reagentes, pode tentar fazer uma poção com Alquimia.
         *   **Loot e Itens:** Para recompensar o jogador com um item aleatório, use `"state_changes": {"inventory.add_random": nivel_do_item}`. O jogador pode precisar usar o comando "identificar" para revelar as propriedades de um item.
+        *   **Combate:** Se houver monstros na cena (`monsters` na raiz do JSON de estado), o combate é possível. Você pode fazer o jogador atacar um monstro usando `"state_changes": {"player.attack": "Nome do Monstro"}`. Descreva o resultado do ataque de forma vívida.
+        *   **Exploração:** Preste atenção na chave `location`. Se ela não for nula, significa que o jogador está em um Ponto de Interesse. Use o nome e a descrição desse local em sua narração para enriquecer o mundo.
     4.  **Formato de Saída OBRIGATÓRIO:** Sua resposta DEVE ser um único bloco de código JSON, sem nenhum texto antes ou depois.
     5.  **Estrutura do JSON:** O JSON deve ter as seguintes chaves no nível raiz:
         -   `narration`: (string) Uma descrição do que acontece.

@@ -15,3 +15,15 @@ class NPC(Character):
         Retorna a fala do NPC.
         """
         return f"{self.name} diz: '{self.dialog}'"
+
+class Monster(Character):
+    """
+    Representa um monstro ou criatura hostil.
+    """
+    def __init__(self, name: str, description: str, level: int, hp: int, armor: int):
+        super().__init__(name, "Monstro")
+        self.description = description
+        self.level = level
+        self.hp = hp
+        self.max_hp = hp
+        self.armor = armor

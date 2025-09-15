@@ -46,17 +46,42 @@ def interact():
     # --- Processamento de Comandos Mecânicos Especiais ---
     # Certos comandos são melhor tratados aqui do que pela IA.
     action_parts = player_action.lower().split()
-    if action_parts[0] == "identificar":
+    command = action_parts[0]
+
+    if command == "identificar":
+        item_name = " ".join(action_parts[1:])
+        narration = "Você precisa especificar o que quer identificar." if not item_name else game.identify_item(item_name)
+        return jsonify({"narration": narration, "gameState": game.to_dict()})
+
+    elif command == "equipar":
         item_name = " ".join(action_parts[1:])
         if not item_name:
-            narration = "Você precisa especificar o que quer identificar."
+            narration = "Especifique o item que você quer equipar."
         else:
-            narration = game.identify_item(item_name)
+            item_to_equip = next((item for item in game.player.inventory.backpack if item.name.lower() == item_name.lower()), None)
+            if item_to_equip:
+                game.player.inventory.equip(game.player, item_to_equip)
+                narration = f"Você equipou {item_name}."
+            else:
+                narration = f"Você não tem um '{item_name}' na sua mochila."
+        return jsonify({"narration": narration, "gameState": game.to_dict()})
 
-        return jsonify({
-            "narration": narration,
-            "gameState": game.to_dict()
-        })
+    elif command == "desequipar":
+        # Mapeia nomes em português para os slots internos
+        slot_map = {s.value: s for s in ItemSlot}
+        slot_map.update({"anel 1": "ring_1", "anel 2": "ring_2", "brinco 1": "earring_1", "brinco 2": "earring_2"})
+
+        slot_input = " ".join(action_parts[1:])
+        if not slot_input:
+            narration = "Especifique o slot que você quer desequipar (ex: cabeça, anel 1)."
+        else:
+            slot_to_unequip = slot_map.get(slot_input)
+            if slot_to_unequip:
+                game.player.inventory.unequip(game.player, slot_to_unequip)
+                narration = f"Você desequipou o item do slot '{slot_input}'."
+            else:
+                narration = f"Slot desconhecido: '{slot_input}'."
+        return jsonify({"narration": narration, "gameState": game.to_dict()})
 
     # 1. Obter o estado atual do jogo
     current_state_dict = game.to_dict()
