@@ -110,12 +110,17 @@ def interact():
         ai_result = get_ai_response(current_state_dict, follow_up_action)
 
     # 4. Aplicar as mudanças de estado retornadas pela IA (da primeira ou segunda chamada)
+    combat_narration = None
     if ai_result.get("state_changes"):
-        game.apply_state_changes(ai_result["state_changes"])
+        combat_narration = game.apply_state_changes(ai_result["state_changes"])
 
     # 5. Montar a resposta final para o frontend
+    final_narration = ai_result.get("narration", "O mestre parece ter se perdido em pensamentos...")
+    if combat_narration:
+        final_narration += f"\n\n[COMBATE] {combat_narration}"
+
     response_data = {
-        "narration": ai_result.get("narration", "O mestre parece ter se perdido em pensamentos..."),
+        "narration": final_narration,
         "gameState": game.to_dict() # Pega o estado sempre atualizado
     }
 

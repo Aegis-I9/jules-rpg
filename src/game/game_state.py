@@ -108,16 +108,15 @@ class GameState:
                 elif key == "player.attack":
                     target_name = value
                     target = next((m for m in self.monsters_in_scene if m.name.lower() == target_name.lower()), None)
-                    if target:
+                    if target and target.is_alive():
                         attack_narration = self.resolve_attack(self.player, target)
-                        # Este é um ponto para melhorar: como mesclar esta narração com a da IA?
-                        # Por enquanto, apenas imprimimos no console do servidor.
-                        print(attack_narration)
+                        # A narração do ataque será tratada no loop principal do app
                     else:
-                        print(f"Alvo de ataque não encontrado: {target_name}")
+                        print(f"Alvo de ataque inválido ou não encontrado: {target_name}")
 
             except Exception as e:
                 print(f"Erro ao aplicar a mudança de estado '{key}': {e}")
+        return attack_narration # Retorna a narração do combate, se houver
 
     def resolve_attack(self, attacker: Character, target: Character) -> str:
         """
@@ -198,8 +197,8 @@ class GameState:
             "character": {
                 "name": self.player.name,
                 "level": self.player.level,
-                "hp": f"{self.player.hp}/{self.player.max_hp}",
-                "mp": f"{self.player.mp}/{self.player.max_mp}",
+                "hp": {"current": self.player.hp, "max": self.player.max_hp},
+                "mp": {"current": self.player.mp, "max": self.player.max_mp},
                 "armor": self.player.armor,
                 "attributes": self.player.attributes,
                 "professions": {name: prof.level for name, prof in self.player.professions.items()}

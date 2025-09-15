@@ -35,6 +35,21 @@ document.addEventListener('DOMContentLoaded', () => {
     function updateCharacterPane(charData) {
         document.getElementById('char-name').textContent = charData.name;
         document.getElementById('char-level').textContent = charData.level;
+
+        // Atualiza Barras de HP e MP
+        const hp = charData.hp;
+        const hpBarFill = document.querySelector('#hp-bar .bar-fill');
+        const hpBarText = document.querySelector('#hp-bar .bar-text');
+        hpBarFill.style.width = `${(hp.current / hp.max) * 100}%`;
+        hpBarText.textContent = `${hp.current} / ${hp.max}`;
+
+        const mp = charData.mp;
+        const mpBarFill = document.querySelector('#mp-bar .bar-fill');
+        const mpBarText = document.querySelector('#mp-bar .bar-text');
+        mpBarFill.style.width = `${(mp.current / mp.max) * 100}%`;
+        mpBarText.textContent = `${mp.current} / ${mp.max}`;
+
+        // Atualiza Atributos
         document.getElementById('attr-strength').textContent = charData.attributes.strength;
         document.getElementById('attr-dexterity').textContent = charData.attributes.dexterity;
         // ... adicione outros atributos conforme necessário
