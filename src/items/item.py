@@ -17,26 +17,37 @@ class ItemSlot(Enum):
 
 class Item:
     """
-    Classe base para todos os itens do jogo.
+    Classe base para todos os itens do jogo, agora com mais detalhes.
     """
-    def __init__(self, name: str, description: str, value: int = 0):
+    def __init__(self, name: str, description: str, quality: str = 'comum',
+                 item_level: int = 1, is_identified: bool = True,
+                 lore_description: str = None, ascii_art: str = None, value: int = 0):
         self.name = name
         self.description = description
+        self.quality = quality
+        self.item_level = item_level
+        self.is_identified = is_identified
+        self.lore_description = lore_description
+        self.ascii_art = ascii_art
         self.value = value
 
     def __str__(self) -> str:
-        return f"{self.name}: {self.description}"
+        if not self.is_identified:
+            return f"Item Não Identificado ({self.quality})"
+        return f"{self.name} (Nível {self.item_level}, {self.quality})"
 
 class Equipment(Item):
     """
     Classe para itens que podem ser equipados.
     """
-    def __init__(self, name: str, description: str, slot: ItemSlot, stats_bonus: dict = None, value: int = 0):
-        super().__init__(name, description, value)
+    def __init__(self, name: str, description: str, slot: ItemSlot, stats_bonus: dict = None, **kwargs):
+        super().__init__(name, description, **kwargs)
         self.slot = slot
         self.stats_bonus = stats_bonus if stats_bonus else {}
 
     def __str__(self) -> str:
+        if not self.is_identified:
+            return f"Equipamento Não Identificado ({self.quality})"
         return f"{self.name} ({self.slot.value}) - Bônus: {self.stats_bonus}"
 
 class Reagent(Item):

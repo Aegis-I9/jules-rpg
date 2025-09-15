@@ -41,6 +41,7 @@ def get_ai_response(game_state_dict: dict, player_action: str) -> dict:
         *   **Testes de Perícia:** Para ações incertas (escalar um muro, persuadir um guarda), solicite um teste de perícia. Para fazer isso, inclua a chave `"skill_check": {"attribute": "nome_do_atributo", "dc": valor_da_dificuldade}` em sua resposta. O sistema irá rolar o dado e lhe informar o resultado no próximo turno. NÃO invente o resultado do dado.
         *   **Reputação:** As reações dos NPCs devem ser influenciadas pela reputação do jogador com a facção deles. Ações contra uma facção devem diminuir a reputação. Ajuda deve aumentar. Use `"state_changes": {"reputation.Nome da Facção": -5}` para alterar a reputação.
         *   **Profissões:** Ofereça oportunidades para o jogador usar suas profissões. Se houver ervas, um jogador com Herbalismo pode tentar coletá-las. Se ele tiver reagentes, pode tentar fazer uma poção com Alquimia.
+        *   **Loot e Itens:** Para recompensar o jogador com um item aleatório, use `"state_changes": {"inventory.add_random": nivel_do_item}`. O jogador pode precisar usar o comando "identificar" para revelar as propriedades de um item.
     4.  **Formato de Saída OBRIGATÓRIO:** Sua resposta DEVE ser um único bloco de código JSON, sem nenhum texto antes ou depois.
     5.  **Estrutura do JSON:** O JSON deve ter as seguintes chaves no nível raiz:
         -   `narration`: (string) Uma descrição do que acontece.
@@ -52,6 +53,15 @@ def get_ai_response(game_state_dict: dict, player_action: str) -> dict:
     {
       "narration": "Você avança para o leste, pisando em galhos secos. O som ecoa na floresta silenciosa. Você nota uma pequena caverna escura à sua direita.",
       "state_changes": { "player.position.x": 3 },
+      "skill_check": null
+    }
+    ```
+
+    EXEMPLO 4 (Loot Gerado):
+    ```json
+    {
+      "narration": "Você derrota o goblin! Ao lado do corpo dele, você encontra um pequeno baú de madeira.",
+      "state_changes": { "inventory.add_random": 1 },
       "skill_check": null
     }
     ```

@@ -69,10 +69,6 @@ class Character:
         Realiza um teste de atributo contra uma classe de dificuldade (DC).
         Retorna (sucesso, resultado_total_da_rolagem).
         """
-        # Adicionando sys.path aqui para garantir que o módulo de dados seja encontrado
-        import sys
-        import os
-        sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
         from src.game.dice import roll
 
         modifier = self.get_attribute_modifier(attribute_to_check)

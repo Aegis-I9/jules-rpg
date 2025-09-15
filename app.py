@@ -43,6 +43,21 @@ def interact():
 
     print(f"Ação recebida do jogador: {player_action}")
 
+    # --- Processamento de Comandos Mecânicos Especiais ---
+    # Certos comandos são melhor tratados aqui do que pela IA.
+    action_parts = player_action.lower().split()
+    if action_parts[0] == "identificar":
+        item_name = " ".join(action_parts[1:])
+        if not item_name:
+            narration = "Você precisa especificar o que quer identificar."
+        else:
+            narration = game.identify_item(item_name)
+
+        return jsonify({
+            "narration": narration,
+            "gameState": game.to_dict()
+        })
+
     # 1. Obter o estado atual do jogo
     current_state_dict = game.to_dict()
 

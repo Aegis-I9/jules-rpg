@@ -42,14 +42,24 @@ document.addEventListener('DOMContentLoaded', () => {
 
     /**
      * Atualiza a lista de inventário.
-     * @param {string[]} inventoryItems - Array de nomes de itens.
+     * @param {object[]} inventoryItems - Array de objetos de item.
      */
     function updateInventory(inventoryItems) {
         const inventoryList = document.getElementById('inventory-list');
         inventoryList.innerHTML = ''; // Limpa a lista atual
         inventoryItems.forEach(item => {
             const li = document.createElement('li');
-            li.textContent = item;
+
+            const itemName = document.createElement('span');
+            itemName.className = 'item-name';
+            itemName.textContent = item.name;
+
+            const itemAscii = document.createElement('pre');
+            itemAscii.className = 'item-ascii';
+            itemAscii.textContent = item.ascii || ''; // Usa a arte ASCII ou string vazia
+
+            li.appendChild(itemAscii);
+            li.appendChild(itemName);
             inventoryList.appendChild(li);
         });
     }

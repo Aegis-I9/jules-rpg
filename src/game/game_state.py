@@ -1,11 +1,8 @@
-import sys
-import os
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
-
 from src.character.character import Character
 from src.items.inventory import Inventory
 from src.world.map import GameMap
 from src.items.item import Item, Equipment, ItemSlot
+from src.items.item_generator import create_random_item
 from src.society.faction_manager import FactionManager
 from src.professions.profession import Alchemy, Herbalism
 
@@ -95,16 +92,47 @@ class GameState:
                     faction_name = key.split('.')[1]
                     amount = int(value)
                     self.faction_manager.change_reputation(faction_name, amount)
+                # Lógica para adicionar um item aleatório ao inventário
+                elif key == "inventory.add_random":
+                    item_level = int(value)
+                    new_item = create_random_item(item_level)
+                    self.player.inventory.add_item(new_item)
+                    print(f"Item aleatório gerado e adicionado: {new_item.name}")
 
             except Exception as e:
                 print(f"Erro ao aplicar a mudança de estado '{key}': {e}")
 
+    def identify_item(self, item_name: str) -> str:
+        """
+        Tenta identificar um item no inventário do jogador.
+        """
+        # Tenta encontrar um item já identificado pelo nome exato
+        item_to_identify = next((item for item in self.player.inventory.backpack if item.name.lower() == item_name.lower()), None)
+
+        # Se não encontrar, procura por um item não identificado que possa corresponder
+        if not item_to_identify:
+            unidentified_items = [item for item in self.player.inventory.backpack if not item.is_identified]
+            if not unidentified_items:
+                return f"Você não possui itens não identificados."
+
+            # Tenta encontrar pela palavra-chave (ex: "espada", "poção")
+            best_match = next((item for item in unidentified_items if item_name.lower() in item.name.lower()), None)
+            item_to_identify = best_match if best_match else unidentified_items[0] # Pega o primeiro se não houver match
+
+        if not item_to_identify:
+            return f"Você não possui um item chamado '{item_name}'."
+
+        if item_to_identify.is_identified:
+            return f"O item '{item_to_identify.name}' já está identificado."
+
+        # Lógica de identificação (pode envolver um teste de perícia no futuro)
+        item_to_identify.is_identified = True
+        return f"Você examina o item e descobre que é um(a) {item_to_identify.name}! {item_to_identify.description}"
 
     def to_dict(self) -> dict:
         """
         Serializa o estado atual do jogo em um dicionário para ser enviado como JSON.
         """
-        # Gera uma representação em string do mapa com o jogador
         map_lines = []
         for y in range(self.game_map.height):
             row = ""
@@ -116,6 +144,16 @@ class GameState:
             map_lines.append(row)
         map_string = "\n".join(map_lines)
 
+        # Serializa o inventário com mais detalhes
+        inventory_list = []
+        for item in self.player.inventory.backpack:
+            inventory_list.append({
+                "name": str(item), # Usa o __str__ para mostrar "Não Identificado"
+                "quality": item.quality,
+                "is_identified": item.is_identified,
+                "ascii": item.ascii_art
+            })
+
         return {
             "character": {
                 "name": self.player.name,
@@ -124,7 +162,7 @@ class GameState:
                 "hp": self.player.health_points,
                 "professions": {name: prof.level for name, prof in self.player.professions.items()}
             },
-            "inventory": [item.name for item in self.player.inventory.backpack],
+            "inventory": inventory_list,
             "map": map_string,
             "reputation": self.faction_manager.get_all_reputations()
         }
