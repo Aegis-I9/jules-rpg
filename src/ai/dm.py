@@ -37,32 +37,41 @@ def get_ai_response(game_state_dict: dict, player_action: str) -> dict:
     REGRAS IMPORTANTES:
     1.  **Seja Descritivo:** Narre o que acontece de forma imersiva. Descreva o ambiente, os sons, os cheiros.
     2.  **Mantenha a Coerência:** O mundo deve ser consistente. Se uma porta for destruída, ela deve permanecer destruída. Ações devem ter consequências lógicas.
-    3.  **Seja Justo:** As ações do jogador podem falhar. Se um jogador tentar algo impossível, descreva a falha de forma realista.
+    3.  **Use os Sistemas de Jogo:**
+        *   **Testes de Perícia:** Para ações incertas (escalar um muro, persuadir um guarda), solicite um teste de perícia. Para fazer isso, inclua a chave `"skill_check": {"attribute": "nome_do_atributo", "dc": valor_da_dificuldade}` em sua resposta. O sistema irá rolar o dado e lhe informar o resultado no próximo turno. NÃO invente o resultado do dado.
+        *   **Reputação:** As reações dos NPCs devem ser influenciadas pela reputação do jogador com a facção deles. Ações contra uma facção devem diminuir a reputação. Ajuda deve aumentar. Use `"state_changes": {"reputation.Nome da Facção": -5}` para alterar a reputação.
+        *   **Profissões:** Ofereça oportunidades para o jogador usar suas profissões. Se houver ervas, um jogador com Herbalismo pode tentar coletá-las. Se ele tiver reagentes, pode tentar fazer uma poção com Alquimia.
     4.  **Formato de Saída OBRIGATÓRIO:** Sua resposta DEVE ser um único bloco de código JSON, sem nenhum texto antes ou depois.
-    5.  **Estrutura do JSON:** O JSON deve ter DUAS chaves no nível raiz:
-        -   `narration`: (string) Uma descrição do que acontece como resultado da ação do jogador.
-        -   `state_changes`: (objeto) Um objeto JSON contendo as alterações a serem aplicadas ao estado do jogo. Use notação de ponto para chaves aninhadas. Se nada mudar, retorne um objeto vazio {{}}.
+    5.  **Estrutura do JSON:** O JSON deve ter as seguintes chaves no nível raiz:
+        -   `narration`: (string) Uma descrição do que acontece.
+        -   `state_changes`: (objeto) Um objeto JSON com as alterações a serem aplicadas ao estado do jogo. Se nada mudar, retorne um objeto vazio `{{}}`.
+        -   `skill_check`: (objeto ou null) Se um teste de perícia for necessário, preencha este campo. Caso contrário, deixe-o como `null`.
 
-    EXEMPLO DE RESPOSTA:
+    EXEMPLO DE RESPOSTA (Movimento):
     ```json
-    {{
+    {
       "narration": "Você avança para o leste, pisando em galhos secos. O som ecoa na floresta silenciosa. Você nota uma pequena caverna escura à sua direita.",
-      "state_changes": {{
-        "player.position.x": 3,
-        "player.position.y": 2
-      }}
-    }}
+      "state_changes": { "player.position.x": 3 },
+      "skill_check": null
+    }
     ```
 
-    EXEMPLO 2 (Interação com item):
+    EXEMPLO 2 (Pedido de Teste de Perícia):
     ```json
-    {{
-      "narration": "Você come a maçã. Ela é surpreendentemente doce e revigorante. Você se sente um pouco melhor.",
-      "state_changes": {{
-        "inventory.remove": "Maçã",
-        "player.hp.current": 11
-      }}
-    }}
+    {
+      "narration": "Você tenta escalar o muro de pedra lisa. É uma tarefa difícil.",
+      "state_changes": {{}},
+      "skill_check": { "attribute": "strength", "dc": 15 }
+    }
+    ```
+
+    EXEMPLO 3 (Consequência de Ação):
+    ```json
+    {
+      "narration": "Você ataca o guarda da cidade sem provocação. Ele saca a espada, e sua reputação com a Coroa do Rei despenca.",
+      "state_changes": { "reputation.Coroa do Rei": -20 },
+      "skill_check": null
+    }
     ```
 
     Agora, processe a seguinte situação:

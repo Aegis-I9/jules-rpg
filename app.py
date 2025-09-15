@@ -43,20 +43,40 @@ def interact():
 
     print(f"Ação recebida do jogador: {player_action}")
 
-    # 1. Obter o estado atual do jogo como um dicionário
+    # 1. Obter o estado atual do jogo
     current_state_dict = game.to_dict()
 
-    # 2. Chamar a IA para obter o resultado da ação
+    # 2. Chamar a IA para obter a resposta inicial
     ai_result = get_ai_response(current_state_dict, player_action)
 
-    # 3. Aplicar as mudanças de estado retornadas pela IA
+    # 3. Verificar se a IA solicitou um teste de perícia
+    skill_check_request = ai_result.get("skill_check")
+    if skill_check_request:
+        print(f"IA solicitou um teste de perícia: {skill_check_request}")
+        attribute = skill_check_request.get("attribute")
+        dc = skill_check_request.get("dc")
+
+        # Realiza o teste
+        success, total_roll = game.player.perform_check(attribute, dc)
+
+        # Constrói uma nova "ação" para a IA informando o resultado do teste
+        follow_up_action = (
+            f"Ação original: '{player_action}'.\n"
+            f"Resultado do teste de {attribute.capitalize()} (DC {dc}): {'Sucesso' if success else 'Falha'} com uma rolagem total de {total_roll}."
+        )
+        print(f"Enviando para a IA o resultado do teste: {follow_up_action}")
+
+        # Chama a IA novamente com o resultado do teste
+        ai_result = get_ai_response(current_state_dict, follow_up_action)
+
+    # 4. Aplicar as mudanças de estado retornadas pela IA (da primeira ou segunda chamada)
     if ai_result.get("state_changes"):
         game.apply_state_changes(ai_result["state_changes"])
 
-    # 4. Montar a resposta final com a narração da IA e o NOVO estado do jogo
+    # 5. Montar a resposta final para o frontend
     response_data = {
         "narration": ai_result.get("narration", "O mestre parece ter se perdido em pensamentos..."),
-        "gameState": game.to_dict() # Pega o estado atualizado
+        "gameState": game.to_dict() # Pega o estado sempre atualizado
     }
 
     return jsonify(response_data)

@@ -38,3 +38,26 @@ class Equipment(Item):
 
     def __str__(self) -> str:
         return f"{self.name} ({self.slot.value}) - Bônus: {self.stats_bonus}"
+
+class Reagent(Item):
+    """
+    Classe para reagentes de crafting e alquimia.
+    """
+    def __init__(self, name: str, description: str, value: int = 1):
+        super().__init__(name, description, value)
+
+class Herb(Reagent):
+    """
+    Classe específica para ervas coletadas com Herbalismo.
+    """
+    def __init__(self, name: str, description: str, value: int = 2):
+        super().__init__(name, description, value)
+
+class Potion(Item):
+    """
+    Classe para poções criadas com Alquimia.
+    """
+    def __init__(self, name: str, description: str, effect: dict, value: int = 10):
+        super().__init__(name, description, value)
+        # Exemplo de efeito: {"type": "heal", "amount": 20}
+        self.effect = effect

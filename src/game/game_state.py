@@ -6,6 +6,8 @@ from src.character.character import Character
 from src.items.inventory import Inventory
 from src.world.map import GameMap
 from src.items.item import Item, Equipment, ItemSlot
+from src.society.faction_manager import FactionManager
+from src.professions.profession import Alchemy, Herbalism
 
 class GameState:
     """
@@ -16,6 +18,11 @@ class GameState:
         # Inicializa os componentes do jogo
         self.player = Character(name="Jules", profession="Aventureiro")
         self.player.inventory = Inventory()
+        self.faction_manager = FactionManager()
+
+        # Adiciona profissões iniciais ao jogador
+        self.player.professions["alquimia"] = Alchemy()
+        self.player.professions["herbalismo"] = Herbalism()
 
         # Adiciona itens de teste
         self.player.inventory.add_item(Equipment("Adaga de Aço", "Uma adaga simples.", ItemSlot.WEAPON))
@@ -83,7 +90,12 @@ class GameState:
                     if item_to_remove:
                         self.player.inventory.backpack.remove(item_to_remove)
                         print(f"Item '{value}' removido do inventário.")
-                # Adicione mais lógicas de mudança de estado aqui
+                # Lógica para alterar reputação
+                elif key.startswith("reputation."):
+                    faction_name = key.split('.')[1]
+                    amount = int(value)
+                    self.faction_manager.change_reputation(faction_name, amount)
+
             except Exception as e:
                 print(f"Erro ao aplicar a mudança de estado '{key}': {e}")
 
@@ -108,8 +120,11 @@ class GameState:
             "character": {
                 "name": self.player.name,
                 "level": self.player.level,
-                "attributes": self.player.attributes
+                "attributes": self.player.attributes,
+                "hp": self.player.health_points,
+                "professions": {name: prof.level for name, prof in self.player.professions.items()}
             },
             "inventory": [item.name for item in self.player.inventory.backpack],
-            "map": map_string
+            "map": map_string,
+            "reputation": self.faction_manager.get_all_reputations()
         }
