@@ -7,6 +7,8 @@ class Character:
         self.profession = profession
         self.level = 1
 
+        self.health_points = {"current": 10, "max": 10}
+
         # Atributos base do personagem
         self.attributes = {
             "strength": 10,
