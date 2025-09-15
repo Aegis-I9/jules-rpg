@@ -1,0 +1,139 @@
+/* Reset Básico e Estilo Geral */
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background-color: #121212;
+    color: #e0e0e0;
+    margin: 0;
+    padding: 1rem;
+    height: calc(100vh - 2rem);
+}
+
+/* Container Principal (Bento Box) */
+.bento-container {
+    display: grid;
+    grid-template-columns: 250px 1fr 250px; /* Colunas para personagem, chat, ferramentas */
+    grid-template-rows: 1fr;
+    gap: 1rem;
+    height: 100%;
+}
+
+.bento-box {
+    background-color: #1e1e1e;
+    border-radius: 16px;
+    padding: 1.5rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    border: 1px solid #333;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto; /* Permite rolagem se o conteúdo for grande */
+}
+
+h2, h3 {
+    color: #ffffff;
+    border-bottom: 1px solid #444;
+    padding-bottom: 0.5rem;
+    margin-top: 0;
+}
+
+/* Pilar Central: Chat */
+#chat-pane {
+    padding: 0; /* O padding será interno */
+}
+
+#chat-log {
+    flex-grow: 1;
+    padding: 1.5rem;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column-reverse; /* Mensagens mais novas embaixo */
+}
+
+.message {
+    margin-bottom: 1rem;
+    max-width: 85%;
+}
+.player-message {
+    align-self: flex-end;
+    background-color: #004d40;
+    padding: 0.5rem 1rem;
+    border-radius: 12px 12px 0 12px;
+}
+.game-message {
+    align-self: flex-start;
+    background-color: #373737;
+    padding: 0.5rem 1rem;
+    border-radius: 12px 12px 12px 0;
+}
+.message p {
+    margin: 0;
+}
+
+#chat-form {
+    display: flex;
+    padding: 1.5rem;
+    border-top: 1px solid #333;
+    background-color: #1e1e1e;
+    border-radius: 0 0 16px 16px;
+}
+
+#chat-input {
+    flex-grow: 1;
+    padding: 0.75rem;
+    border: 1px solid #444;
+    border-radius: 8px;
+    background-color: #2c2c2c;
+    color: #e0e0e0;
+    font-size: 1rem;
+}
+
+#chat-form button {
+    margin-left: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 8px;
+    background-color: #007bff;
+    color: white;
+    cursor: pointer;
+    font-size: 1rem;
+}
+
+/* Pilar Direito: Ferramentas */
+#mini-map {
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 0.8rem;
+    line-height: 1;
+    background-color: #000;
+    padding: 0.5rem;
+    border-radius: 4px;
+    border: 1px solid #444;
+}
+
+#inventory-list, #character-details ul {
+    list-style: none;
+    padding: 0;
+}
+
+#inventory-list li, #character-details li {
+    margin-bottom: 0.5rem;
+    padding: 0.25rem;
+}
+
+#inventory-list li {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    border: 1px solid #333;
+    border-radius: 8px;
+    padding: 0.5rem;
+    text-align: center;
+}
+
+.item-ascii {
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 0.7rem;
+    line-height: 0.8;
+    margin-bottom: 0.5rem;
+    background-color: #000;
+    padding: 0.25rem;
+    border-radius: 4px;
+}

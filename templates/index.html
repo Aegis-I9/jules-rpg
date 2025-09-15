@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RPG Generativo</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="bento-container">
+        <!-- Pilar Esquerdo: Personagem -->
+        <div id="character-pane" class="bento-box">
+            <h2>Personagem</h2>
+            <div id="character-details">
+                <p><strong>Nome:</strong> <span id="char-name">Aventureiro</span></p>
+                <p><strong>Nível:</strong> <span id="char-level">1</span></p>
+                <hr>
+                <h3>Atributos</h3>
+                <ul>
+                    <li><strong>Força:</strong> <span id="attr-strength">10</span></li>
+                    <li><strong>Destreza:</strong> <span id="attr-dexterity">10</span></li>
+                    <li><strong>Agilidade:</strong> <span id="attr-agility">10</span></li>
+                    <li><strong>Inteligência:</strong> <span id="attr-intelligence">10</span></li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Pilar Central: Chat de Interação -->
+        <div id="chat-pane" class="bento-box">
+            <div id="chat-log">
+                <div class="message game-message">
+                    <p><strong>Mestre:</strong> Bem-vindo ao mundo de Eldoria. Você acorda em uma clareira na floresta, o sol mal passando pelas copas das árvores. O que você faz?</p>
+                </div>
+            </div>
+            <form id="chat-form">
+                <input type="text" id="chat-input" placeholder="Digite sua ação..." autocomplete="off" autofocus>
+                <button type="submit">Enviar</button>
+            </form>
+        </div>
+
+        <!-- Pilar Direito: Ferramentas -->
+        <div id="tools-pane" class="bento-box">
+            <h2>Ferramentas</h2>
+            <div class="tool-section">
+                <h3>Mini-Mapa</h3>
+                <pre id="mini-map"></pre>
+            </div>
+            <div class="tool-section">
+                <h3>Inventário</h3>
+                <ul id="inventory-list">
+                    <!-- O conteúdo do inventário será preenchido por JavaScript -->
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
