@@ -96,11 +96,14 @@ class Character:
         """
         Calcula o valor total de um atributo, incluindo bônus de equipamento.
         """
+        # A importação é feita aqui para evitar importação circular
+        from src.items.item import Equipment
+
         base_value = self.attributes.get(attribute_name, 0)
         bonus = 0
         if self.inventory:
             for item in self.inventory.equipped.values():
-                if item and isinstance(item, item.Equipment) and item.stats_bonus:
+                if item and isinstance(item, Equipment) and item.stats_bonus:
                     bonus += item.stats_bonus.get(attribute_name, 0)
         return base_value + bonus
 

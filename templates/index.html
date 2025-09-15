@@ -3,7 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RPG Generativo</title>
+    <title>AEGIS: A busca da garrafa perdida</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Lato:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
@@ -11,9 +14,18 @@
         <!-- Pilar Esquerdo: Personagem -->
         <div id="character-pane" class="bento-box">
             <h2>Personagem</h2>
+            <h1 class="game-title">AEGIS</h1>
+            <p class="game-subtitle">A Busca da Garrafa Perdida</p>
             <div id="character-details">
                 <p><strong>Nome:</strong> <span id="char-name">Aventureiro</span></p>
                 <p><strong>Nível:</strong> <span id="char-level">1</span></p>
+
+                <div class="stat-bar-label">HP</div>
+                <div id="hp-bar" class="stat-bar"><div class="bar-fill"></div><span class="bar-text"></span></div>
+
+                <div class="stat-bar-label">MP</div>
+                <div id="mp-bar" class="stat-bar"><div class="bar-fill"></div><span class="bar-text"></span></div>
+
                 <hr>
                 <h3>Atributos</h3>
                 <ul>
